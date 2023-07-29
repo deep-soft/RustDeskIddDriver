@@ -13,7 +13,8 @@ jobs:
         # configuration: [Debug, Release]
         configuration: [Release]
         platform: [x64]
-        target: [Windows10, Windows7]
+        # target: [Windows10, Windows7]
+        target: [Windows10]
 
     runs-on: windows-2022
 
@@ -24,12 +25,12 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: Install Windows 8.1 SDK
-        if: ${{ matrix.target }}==Windows7
-        shell: powershell
-        run: |
-          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
-          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
+#      - name: Install Windows 8.1 SDK
+#        if: ${{ matrix.target }}='Windows7'
+#        shell: powershell
+#        run: |
+#          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
+#          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
     
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
