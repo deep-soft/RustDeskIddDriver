@@ -90,6 +90,9 @@ jobs:
 #        run: |
 #          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
 #         Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
+#
+#      - name: Add MSBuild to PATH
+#        uses: microsoft/setup-msbuild@v1.3.1
 
       - name: Install MSVC 2015 (v140) and Windows 8.1 SDK
         shell: powershell
@@ -101,9 +104,6 @@ jobs:
           "--add", "Microsoft.VisualStudio.Component.VC.140", `
           "--add", "Microsoft.VisualStudio.Component.Windows81SDK", `
           "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
-
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.1
 
       - name: Build solution
         run: |
