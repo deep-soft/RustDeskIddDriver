@@ -45,16 +45,17 @@ jobs:
         continue-on-error: true
         shell: cmd
         run: |
-          echo "current dir"
+          echo "current dir 1"
           dir
           echo %cd% > crt-dir
           set /p crt_dir=<crt-dir
+          echo "crt-dir=" %crt-dir%
           pushd C:\
-          echo "current dir"
+          echo "current dir 2"
           dir
           dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path.txt
           popd
-          echo "current dir"
+          echo "current dir 3"
           dir
           echo "msbuild_path.txt"
           type msbuild_path.txt
