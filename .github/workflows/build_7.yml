@@ -45,21 +45,23 @@ jobs:
         continue-on-error: true
         shell: cmd
         run: |
-          echo %cd% > crt_dir.txt
-          type crt_dir.txt
-          set /p crt_dir=<crt_dir.txt
+          mkdir D:\tmp
+          echo %cd% > D:\tmp\crt_dir.txt
+          type D:\tmp\crt_dir.txt
+          set /p crt_dir=<D:\tmp\crt_dir.txt
           echo "crt_dir=" %crt_dir%
           pushd "C:\Program Files\Microsoft Visual Studio"
           echo 'dir /b /s msbuild.exe 1'
-          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild.txt
+          dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild.txt
           popd
-          echo %crt_dir%"\msbuild.txt"
-          type %crt_dir%\msbuild.txt
-          set /p msbuild<%crt_dir%\msbuild.txt
+          echo D:\tmp\msbuild.txt
+          type D:\tmp\msbuild.txt
+          set /p msbuild<D:\tmp\msbuild.txt
           for %i in ("%msbuild") do set msbuild_path=%~di%~pi
           echo %msbuild_path%
-          echo %msbuild_path% > msbuild_path.txt
+          echo %msbuild_path% > D:\tmp\msbuild_path.txt
           set PATH=%PATH%;%msbuild_path%
+          echo "PATH=%PATH%;%msbuild_path%" >> $GITHUB_ENV
 
       - name: Create Zip Archive with lists
         continue-on-error: true
@@ -74,7 +76,7 @@ jobs:
           directory: '.'
           exclusions: '*.map *.pdb ./.git/* .git/*'
           recursive_exclusions: '*.map *.pdb'
-          path: 'D:\tmp\msbuild_path-1.txt D:\tmp\msbuild_path-2.txt'
+          path: 'D:\tmp\msbuild.txt D:\tmp\msbuild_path.txt'
 
       - name: Publish
         continue-on-error: true
@@ -91,8 +93,8 @@ jobs:
         with:
           name: ${{ env.TAG_NAME }}
           path: |
-            msbuild.txt
-            msbuild_path.txt
+            D:\tmp\msbuild.txt
+            D:\tmp\msbuild_path.txt
 
 #      - name: dir program files
 #        continue-on-error: true
