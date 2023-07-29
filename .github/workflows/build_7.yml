@@ -57,11 +57,13 @@ jobs:
           echo D:\tmp\msbuild.txt
           type D:\tmp\msbuild.txt
           set /p msbuild<D:\tmp\msbuild.txt
-          for %%i in ("%msbuild%") do set msbuild_path=%%~dpi
-          echo %msbuild_path%
-          echo %msbuild_path% > D:\tmp\msbuild_path.txt
-          set PATH=%msbuild_path%;%PATH%
-          echo "PATH=%msbuild_path%;%PATH%" >> $GITHUB_ENV
+          echo "MSBUILD_EXE=%msbuild%" >> $GITHUB_ENV
+          :: extract msbuild path not working
+          :: for %i in ("%msbuild%") do set msbuild_path=%~dpi
+          :: echo %msbuild_path%
+          :: echo %msbuild_path% > D:\tmp\msbuild_path.txt
+          :: set PATH=%msbuild_path%;%PATH%
+          :: echo "PATH=%msbuild_path%;%PATH%" >> $GITHUB_ENV
 
       - name: Create Zip Archive with lists
         continue-on-error: true
@@ -76,7 +78,7 @@ jobs:
           directory: '.'
           exclusions: '*.map *.pdb ./.git/* .git/*'
           recursive_exclusions: '*.map *.pdb'
-          path: 'D:\tmp\msbuild.txt D:\tmp\msbuild_path.txt'
+          path: 'D:\tmp\msbuild.txt'
 
       - name: Publish
         continue-on-error: true
@@ -94,7 +96,6 @@ jobs:
           name: ${{ env.TAG_NAME }}
           path: |
             D:\tmp\msbuild.txt
-            D:\tmp\msbuild_path.txt
 
 #      - name: dir program files
 #        continue-on-error: true
@@ -130,12 +131,11 @@ jobs:
 #        uses: microsoft/setup-msbuild@v1.3
 #        with:
 #          vs-version: '[14.0]'
-    
+
       - name: Build solution
         shell: cmd
         run: |
-          echo %PATH%
-          msbuild ${{ env.Solution_Path }} /property:Configuration=${{ env.Configuration }} /property:Platform=${{ env.Platform }} /property:TargetVersion=${{ env.Target }}
+          ${{ env.MSBUILD_EXE }} ${{ env.Solution_Path }} /property:Configuration=${{ env.Configuration }} /property:Platform=${{ env.Platform }} /property:TargetVersion=${{ env.Target }}
         env:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
@@ -171,3 +171,32 @@ jobs:
           # tag_name: ${{ env.TAG_NAME }}-${{ env.VERSION }}
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
+
+      - name: dir program files
+        continue-on-error: true
+        shell: cmd
+        run: |
+          dir /s "C:\Program Files\" >D:\tmp\program-files.dir
+          dir /s "C:\Program Files (x86)\" >D:\tmp\program-files-86.dir
+          
+      - name: Create Zip Archive with lists
+        continue-on-error: true
+        uses: deep-soft/zip-release@v2
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+          Target: ${{ matrix.target }}
+        with:
+          type: 'zip'
+          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-list.zip'
+          directory: '.'
+          exclusions: '*.map *.pdb ./.git/* .git/*'
+          recursive_exclusions: '*.map *.pdb'
+          path: 'D:\tmp\program-files.dir D:\tmp\program-files-86.dir'
+          
+      - name: Upload zip
+        continue-on-error: true
+        uses: deep-soft/upload-artifact@main
+        with:
+          name: ${{ env.TAG_NAME }}
+          path: ${{ env.ZIP_RELEASE_ARCHIVE }}
