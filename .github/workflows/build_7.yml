@@ -57,7 +57,7 @@ jobs:
           echo D:\tmp\msbuild.txt
           type D:\tmp\msbuild.txt
           set /p msbuild<D:\tmp\msbuild.txt
-          for %i in ("%msbuild%") do set msbuild_path=%~fi
+          for %i in ("%msbuild%") do set msbuild_path=%~dpi
           echo %msbuild_path%
           echo %msbuild_path% > D:\tmp\msbuild_path.txt
           set PATH=%msbuild_path%;%PATH%
