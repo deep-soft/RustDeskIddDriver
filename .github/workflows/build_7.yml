@@ -77,6 +77,30 @@ jobs:
           set /p msbuild_path2=<D:\tmp\msbuild_path-2.txt
           if (NOT .%msbuild_path2%==.) set PATH=%msbuild_path2%;%PATH%
 
+      - name: Create Zip Archive with lists
+        continue-on-error: true
+        uses: deep-soft/zip-release@v2
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+          Target: ${{ matrix.target }}
+        with:
+          type: 'zip'
+          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-msbuild-txt.zip'
+          directory: '.'
+          exclusions: '*.map *.pdb ./.git/* .git/*'
+          recursive_exclusions: '*.map *.pdb'
+          path: 'D:\tmp\msbuild_path-1.txt D:\tmp\msbuild_path-2.txt'
+
+      - name: Publish
+        continue-on-error: true
+        uses: deep-soft/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          # tag_name: ${{ env.TAG_NAME }}-${{ env.VERSION }}
+          files: |
+            ${{ env.ZIP_RELEASE_ARCHIVE }}
+
       - name: Upload files
         continue-on-error: true
         uses: deep-soft/upload-artifact@main
