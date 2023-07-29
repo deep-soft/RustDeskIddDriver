@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-2022
 
     env:
-      Solution_Path: "${{ env.TAG_NAME }}.sln"
+      Solution_Path: "${{ TAG_NAME }}.sln"
 
     steps:
       - name: Check out repository code
