@@ -45,17 +45,18 @@ jobs:
         continue-on-error: true
         shell: cmd
         run: |
+          mkdir D:\tmp
           echo "current dir 1"
           dir
-          echo %cd% > crt-dir
-          set /p crt_dir=<crt-dir
-          echo "crt-dir=" %crt-dir%
+          echo "%cd%" > D:\tmp\crt-dir.txt
+          set /p crt_dir=<D:\tmp\crt-dir.txt
+          echo "crt-dir=%crt-dir%"
           pushd "C:\Program Files"
           echo "current dir 2"
           dir
           echo 'dir /b /s msbuild.exe 1'
           dir /b /s msbuild.exe
-          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-1.txt
+          dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild_path-1.txt
           popd
 
           # D:\a\RustDeskIddDriver\RustDeskIddDriver
@@ -64,16 +65,16 @@ jobs:
           dir
           echo 'dir /b /s msbuild.exe 2'
           dir /b /s msbuild.exe
-          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-2.txt
+          dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild_path-2.txt
           popd
 
           echo "current dir 4"
           dir
           echo "msbuild_path1.txt"
-          type msbuild_path1.txt
+          type D:\tmp\msbuild_path-1.txt
           echo "msbuild_path2.txt"
-          type msbuild_path2.txt          
-          set /p msbuild_path2=<msbuild_path2.txt
+          type D:\tmp\msbuild_path-2.txt
+          set /p msbuild_path2=<D:\tmp\msbuild_path-2.txt
           if (NOT .%msbuild_path2%==.) set PATH=%msbuild_path2%;%PATH%
 
       - name: Upload files
@@ -82,8 +83,8 @@ jobs:
         with:
           name: ${{ env.TAG_NAME }}
           path: |
-            msbuild_path1.txt
-            msbuild_path2.txt
+            D:\tmp\msbuild_path-1.txt
+            D:\tmp\msbuild_path-2.txt
 
       - name: dir program files
         continue-on-error: true
@@ -105,7 +106,7 @@ jobs:
           directory: '.'
           exclusions: '*.map *.pdb ./.git/* .git/*'
           recursive_exclusions: '*.map *.pdb'
-          path: 'program-files.dir program-files-86.dir msbuild_path.txt'
+          path: 'program-files.dir program-files-86.dir D:\tmp\msbuild_path-1.txt D:\tmp\msbuild_path-2.txt'
           
       - name: Upload zip
         continue-on-error: true
