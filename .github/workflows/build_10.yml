@@ -20,15 +20,17 @@ jobs:
 
     runs-on: windows-2022
 
-    env:
-      Solution_Path: $TAG_NAME.sln
-
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
    
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
+        
+      - name: Set Solution name
+        shell: bash
+        run: |
+          echo "Solution_Path=${{ env.TAG_NAME }}.sln" >> $GITHUB_ENV
 
       - name: Build solution
         run: |
