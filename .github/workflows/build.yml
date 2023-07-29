@@ -10,7 +10,8 @@ jobs:
   build:
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        # configuration: [Debug, Release]
+        configuration: [Release]
         platform: [x64]
     runs-on: windows-2022
     env:
