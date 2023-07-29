@@ -40,18 +40,15 @@ jobs:
         shell: bash
         run: |
           echo "Solution_Path=${{ env.TAG_NAME }}.sln" >> $GITHUB_ENV
-          
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.3
-        with:
-          vs-version: '[14.0]'
-          
+
       - name: dir program files
+        continue-on-error: true
         run: |
           dir/s "C:\Program Files\" >program-files.dir
           dir/s "C:\Program Files (x86)\" >program-files-86.dir
           
       - name: Create Zip Archive with lists
+        continue-on-error: true
         uses: deep-soft/zip-release@v2
         env:
           Configuration: ${{ matrix.configuration }}
@@ -71,6 +68,12 @@ jobs:
         with:
           name: ${{ env.TAG_NAME }}
           path: ${{ env.ZIP_RELEASE_ARCHIVE }}
+          
+      - name: Add MSBuild to PATH
+        continue-on-error: true
+        uses: microsoft/setup-msbuild@v1.3
+        with:
+          vs-version: '[14.0]'
     
       - name: Build solution
         run: |
