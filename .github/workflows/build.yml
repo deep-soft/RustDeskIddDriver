@@ -1,0 +1,40 @@
+name: Build RustDeskIddDriver
+on:
+  workflow_dispatch:
+  workflow_call:
+#  push:
+#    branches:
+#      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64]
+    runs-on: windows-2022
+    env:
+      Solution_Path: RustDeskIddDriver.sln
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build solution
+        run: |
+          msbuild ${{ env.Solution_Path }} -p:Configuration:${{ env.Configuration }} -p:Platform:${{ env.Platform }}
+        env:
+          Configuration: ${{ matrix.configuration }}
+          Platform: ${{ matrix.platform }}
+
+      - name: Create Zip Archive Release
+        uses: deep-soft/zip-release@v2
+        with:
+          type: 'zip'
+          filename: 'RustDeskIddDriver-${{ env.Configuration }}-${{ env.Platform }}.zip'
+          directory: '.'
+          exclusions: '*.map *.pdb ./.git/* .git/*'
+          recursive_exclusions: '*.map *.pdb changelog *Bel* *Cze* *Ger* *Hun* *Ita* *Lit* *Pol* *Rus* *Sky* *Spa* *Ukr*'
+          path: 'RustDeskIddDriver.*'
