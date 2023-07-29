@@ -53,6 +53,8 @@ jobs:
           pushd "C:\Program Files"
           echo "current dir 2"
           dir
+          echo 'dir /b /s msbuild.exe 1'
+          dir /b /s msbuild.exe
           dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-1.txt
           popd
 
@@ -60,8 +62,11 @@ jobs:
           pushd "C:\Program Files (x86)"
           echo "current dir 3"
           dir
+          echo 'dir /b /s msbuild.exe 2'
+          dir /b /s msbuild.exe
           dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-2.txt
           popd
+
           echo "current dir 4"
           dir
           echo "msbuild_path1.txt"
@@ -70,6 +75,15 @@ jobs:
           type msbuild_path2.txt          
           set /p msbuild_path2=<msbuild_path2.txt
           if (NOT .%msbuild_path2%==.) set PATH=%msbuild_path2%;%PATH%
+
+      - name: Upload files
+        continue-on-error: true
+        uses: deep-soft/upload-artifact@main
+        with:
+          name: ${{ env.TAG_NAME }}
+          path: |
+            msbuild_path1.txt
+            msbuild_path2.txt
 
       - name: dir program files
         continue-on-error: true
