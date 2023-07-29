@@ -57,7 +57,8 @@ jobs:
           echo D:\tmp\msbuild.txt
           type D:\tmp\msbuild.txt
           set /p msbuild<D:\tmp\msbuild.txt
-          echo "MSBUILD_EXE=%msbuild%" >> $GITHUB_ENV
+          echo "msbuild=" %msbuild%
+          echo MSBUILD_EXE=%msbuild% >> $GITHUB_ENV
           :: extract msbuild path not working
           :: for %i in ("%msbuild%") do set msbuild_path=%~dpi
           :: echo %msbuild_path%
