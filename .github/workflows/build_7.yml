@@ -61,6 +61,24 @@ jobs:
           exclusions: '*.map *.pdb ./.git/* .git/*'
           recursive_exclusions: '*.map *.pdb'
           path: 'program-files.dir program-files-86.dir'
+          
+      - name: search msbuild.exe
+        continue-on-error: true
+        run: |
+          echo "current dir"
+          dir
+          echo %cd% > crt-dir
+          set /p crt_dir=<crt-dir
+          pushd C:\
+          echo "current dir"
+          dir
+          dir/b/s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path
+          popd
+          echo "current dir"
+          dir
+          type msbuild_path
+          set /p msbuild_path=<msbuild_path
+          if NOT .%msbuild_path%==. set PATH=%msbuild_path%;%PATH%
 
       - name: Upload zip
         continue-on-error: true
