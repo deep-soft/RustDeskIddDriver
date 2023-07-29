@@ -13,14 +13,23 @@ jobs:
         # configuration: [Debug, Release]
         configuration: [Release]
         platform: [x64]
-        target: [Windows7, Windows10]
+        target: [Windows10, Windows7]
+
     runs-on: windows-2022
+
     env:
       Solution_Path: .\RustDeskIddDriver.sln
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
 
+      - name: Install Windows 8.1 SDK
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
+          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
+    
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
 
@@ -44,7 +53,7 @@ jobs:
           filename: 'RustDeskIddDriver-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
           directory: 'x64\Release'
           exclusions: '*.map *.pdb ./.git/* .git/*'
-          recursive_exclusions: '*.map *.pdb changelog *Bel* *Cze* *Ger* *Hun* *Ita* *Lit* *Pol* *Rus* *Sky* *Spa* *Ukr*'
+          recursive_exclusions: '*.map *.pdb'
           path: 'RustDeskIddDriver.*'
 
       - name: Upload zip
