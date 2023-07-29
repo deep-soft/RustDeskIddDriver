@@ -50,17 +50,26 @@ jobs:
           echo %cd% > crt-dir
           set /p crt_dir=<crt-dir
           echo "crt-dir=" %crt-dir%
-          pushd C:\
+          pushd "C:\Program Files"
           echo "current dir 2"
           dir
-          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path.txt
+          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-1.txt
           popd
+
+          # D:\a\RustDeskIddDriver\RustDeskIddDriver
+          pushd "C:\Program Files (x86)"
           echo "current dir 3"
           dir
-          echo "msbuild_path.txt"
-          type msbuild_path.txt
-          set /p msbuild_path=<msbuild_path.txt
-          if NOT .%msbuild_path%==. set PATH=%msbuild_path%;%PATH%
+          dir /b /s msbuild.exe | grep amd64 >%crt_dir%\msbuild_path-2.txt
+          popd
+          echo "current dir 4"
+          dir
+          echo "msbuild_path1.txt"
+          type msbuild_path1.txt
+          echo "msbuild_path2.txt"
+          type msbuild_path2.txt          
+          set /p msbuild_path2=<msbuild_path2.txt
+          if (NOT .%msbuild_path2%==.) set PATH=%msbuild_path2%;%PATH%
 
       - name: dir program files
         continue-on-error: true
