@@ -13,8 +13,8 @@ jobs:
         # configuration: [Debug, Release]
         configuration: [Release]
         platform: [x64]
-        # target: [Windows10, Windows7]
-        target: [Windows10]
+        target: [Windows10, Windows7]
+        # target: [Windows10]
 
     runs-on: windows-2022
 
