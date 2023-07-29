@@ -53,29 +53,31 @@ jobs:
           type D:\tmp\crt-dir.txt
           set /p crt_dir=<D:\tmp\crt-dir.txt
           echo "crt_dir=" %crt_dir%
-          pushd "C:\Program Files"
+          pushd "C:\Program Files\Microsoft Visual Studio"
           echo "current dir 2"
           dir
           echo 'dir /b /s msbuild.exe 1'
           dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild_path-1.txt
           popd
 
-          # D:\a\RustDeskIddDriver\RustDeskIddDriver
-          pushd "C:\Program Files (x86)"
-          echo "current dir 3"
-          dir
-          echo 'dir /b /s msbuild.exe 2'
-          dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild_path-2.txt
-          popd
+          :: # D:\a\RustDeskIddDriver\RustDeskIddDriver
+          :: pushd "C:\Program Files (x86)"
+          :: echo "current dir 3"
+          :: dir
+          :: echo 'dir /b /s msbuild.exe 2'
+          :: dir /b /s msbuild.exe | grep amd64 >D:\tmp\msbuild_path-2.txt
+          :: popd
 
           echo "current dir 4"
           dir
           echo "msbuild_path1.txt"
           type D:\tmp\msbuild_path-1.txt
-          echo "msbuild_path2.txt"
-          type D:\tmp\msbuild_path-2.txt
-          set /p msbuild_path2=<D:\tmp\msbuild_path-2.txt
-          if (NOT .%msbuild_path2%==.) set PATH=%msbuild_path2%;%PATH%
+          :: echo "msbuild_path2.txt"
+          :: type D:\tmp\msbuild_path-2.txt
+          set /p msbuild_path=<D:\tmp\msbuild_path-1.txt
+          if (NOT .%msbuild_path%==.) set PATH=%msbuild_path%;%PATH%
+          echo "msbuild="
+          msbuild
 
       - name: Create Zip Archive with lists
         continue-on-error: true
@@ -110,40 +112,40 @@ jobs:
             D:\tmp\msbuild_path-1.txt
             D:\tmp\msbuild_path-2.txt
 
-      - name: dir program files
-        continue-on-error: true
-        shell: cmd
-        run: |
-          dir /s "C:\Program Files\" >program-files.dir
-          dir /s "C:\Program Files (x86)\" >program-files-86.dir
-          
-      - name: Create Zip Archive with lists
-        continue-on-error: true
-        uses: deep-soft/zip-release@v2
-        env:
-          Configuration: ${{ matrix.configuration }}
-          Platform: ${{ matrix.platform }}
-          Target: ${{ matrix.target }}
-        with:
-          type: 'zip'
-          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-list.zip'
-          directory: '.'
-          exclusions: '*.map *.pdb ./.git/* .git/*'
-          recursive_exclusions: '*.map *.pdb'
-          path: 'program-files.dir program-files-86.dir D:\tmp\msbuild_path-1.txt D:\tmp\msbuild_path-2.txt'
-          
-      - name: Upload zip
-        continue-on-error: true
-        uses: deep-soft/upload-artifact@main
-        with:
-          name: ${{ env.TAG_NAME }}
-          path: ${{ env.ZIP_RELEASE_ARCHIVE }}
-          
-      - name: Add MSBuild to PATH
-        continue-on-error: true
-        uses: microsoft/setup-msbuild@v1.3
-        with:
-          vs-version: '[14.0]'
+#      - name: dir program files
+#        continue-on-error: true
+#        shell: cmd
+#        run: |
+#          dir /s "C:\Program Files\" >program-files.dir
+#          dir /s "C:\Program Files (x86)\" >program-files-86.dir
+#          
+#      - name: Create Zip Archive with lists
+#        continue-on-error: true
+#       uses: deep-soft/zip-release@v2
+#        env:
+#          Configuration: ${{ matrix.configuration }}
+#          Platform: ${{ matrix.platform }}
+#          Target: ${{ matrix.target }}
+#        with:
+#          type: 'zip'
+#          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-list.zip'
+#          directory: '.'
+#          exclusions: '*.map *.pdb ./.git/* .git/*'
+#          recursive_exclusions: '*.map *.pdb'
+#          path: 'program-files.dir program-files-86.dir D:\tmp\msbuild_path-1.txt D:\tmp\msbuild_path-2.txt'
+#          
+#      - name: Upload zip
+#        continue-on-error: true
+#        uses: deep-soft/upload-artifact@main
+#        with:
+#          name: ${{ env.TAG_NAME }}
+#          path: ${{ env.ZIP_RELEASE_ARCHIVE }}
+#          
+#      - name: Add MSBuild to PATH
+#        continue-on-error: true
+#        uses: microsoft/setup-msbuild@v1.3
+#        with:
+#          vs-version: '[14.0]'
     
       - name: Build solution
         run: |
