@@ -25,12 +25,12 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-#      - name: Install Windows 8.1 SDK
-#        if: ${{ matrix.target }}='Windows7'
-#        shell: powershell
-#        run: |
-#          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
-#          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
+      - name: Install Windows 8.1 SDK
+        if: ${{ matrix.target =='Windows7' }}
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Method Get -Uri https://go.microsoft.com/fwlink/p/?LinkId=323507 -OutFile sdksetup.exe -UseBasicParsing
+          Start-Process -Wait sdksetup.exe -ArgumentList "/q", "/norestart", "/features", "OptionId.WindowsDesktopSoftwareDevelopmentKit", "OptionId.NetFxSoftwareDevelopmentKit"
     
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
@@ -53,10 +53,11 @@ jobs:
         with:
           type: 'zip'
           filename: 'RustDeskIddDriver-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
-          directory: 'x64\Release'
+          directory: 'x64/Release'
+          inclusions: '*.cer *.inf *.dll'
           exclusions: '*.map *.pdb ./.git/* .git/*'
           recursive_exclusions: '*.map *.pdb'
-          path: 'RustDeskIddDriver.*'
+          path: 'RustDeskIddDriver.cer RustDeskIddDriver.inf RustDeskIddDriver.dll'
 
       - name: Upload zip
         continue-on-error: true
