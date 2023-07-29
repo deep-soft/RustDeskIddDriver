@@ -10,7 +10,7 @@ env:
   TAG_NAME: RustDeskIddDriver7
 
 jobs:
-  build_Win10:
+  build_Win7:
     strategy:
       matrix:
         # configuration: [Debug, Release]
