@@ -139,6 +139,11 @@ jobs:
         run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
           move 10 100a
+          dir
+          popd
+          pushd "C:\Program Files (x86)\Windows Kits\"
+          move 10 100a
+          dir
           popd
         
       - name: Build solution
@@ -157,6 +162,11 @@ jobs:
         run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
           move 100a 10
+          dir
+          popd
+          pushd "C:\Program Files (x86)\Windows Kits\"
+          move 100a 10
+          dir
           popd
 
       - name: Create Zip Archive Release
