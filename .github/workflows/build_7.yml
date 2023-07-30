@@ -136,6 +136,7 @@ jobs:
       - name: rename kits 10
         continue-on-error: true
         shell: cmd
+        run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
           rename 10 100a
           popd
@@ -153,6 +154,7 @@ jobs:
       - name: restore renamed kits 10
         continue-on-error: true
         shell: cmd
+        run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
           rename 100a 10
           popd
