@@ -138,7 +138,7 @@ jobs:
         shell: cmd
         run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
-          rename 10 100a
+          move 10 100a
           popd
         
       - name: Build solution
@@ -156,7 +156,7 @@ jobs:
         shell: cmd
         run: |
           pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
-          rename 100a 10
+          move 100a 10
           popd
 
       - name: Create Zip Archive Release
