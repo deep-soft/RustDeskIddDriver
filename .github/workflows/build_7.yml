@@ -58,13 +58,13 @@ jobs:
           type D:\tmp\msbuild.txt
           set /p msbuild=<D:\tmp\msbuild.txt
           echo "msbuild=" %msbuild%
-          echo MSBUILD_EXE=%msbuild% >> $GITHUB_ENV
+          echo MSBUILD_EXE=%msbuild% >> %GITHUB_ENV%
           :: extract msbuild path not working
           :: for %i in ("%msbuild%") do set msbuild_path=%~dpi
           :: echo %msbuild_path%
           :: echo %msbuild_path% > D:\tmp\msbuild_path.txt
           :: set PATH=%msbuild_path%;%PATH%
-          :: echo "PATH=%msbuild_path%;%PATH%" >> $GITHUB_ENV
+          :: echo "PATH=%msbuild_path%;%PATH%" >> %GITHUB_ENV%
 
       - name: Create Zip Archive with lists
         continue-on-error: true
