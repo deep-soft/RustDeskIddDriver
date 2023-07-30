@@ -1,4 +1,4 @@
-name: Build RustDeskIddDriver Win8
+name: Build RustDeskIddDriver Win7
 on:
   workflow_dispatch:
   workflow_call:
@@ -7,16 +7,16 @@ on:
 #      - main
 
 env:
-  TAG_NAME: RustDeskIddDriver8
+  TAG_NAME: RustDeskIddDriver7
 
 jobs:
-  build_Win8:
+  build_Win7:
     strategy:
       matrix:
         # configuration: [Debug, Release]
         configuration: [Release]
         platform: [x64]
-        target: [Windows8]
+        target: [Windows7]
 
     runs-on: windows-2022
 
