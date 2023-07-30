@@ -1,4 +1,4 @@
-name: Build RustDeskIddDriver Win10
+name: Build RustDeskIddDriver Win10/Win8.1/Win8
 on:
   workflow_dispatch:
   workflow_call:
