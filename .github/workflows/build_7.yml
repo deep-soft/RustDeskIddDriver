@@ -174,31 +174,31 @@ jobs:
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
 
-      - name: dir program files
-        continue-on-error: true
-        shell: cmd
-        run: |
-          dir /s "C:\Program Files\" >D:\tmp\program-files.dir
-          dir /s "C:\Program Files (x86)\" >D:\tmp\program-files-86.dir
-          
-      - name: Create Zip Archive with lists
-        continue-on-error: true
-        uses: deep-soft/zip-release@v2
-        env:
-          Configuration: ${{ matrix.configuration }}
-          Platform: ${{ matrix.platform }}
-          Target: ${{ matrix.target }}
-        with:
-          type: 'zip'
-          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-list.zip'
-          directory: '.'
-          exclusions: '*.map *.pdb ./.git/* .git/*'
-          recursive_exclusions: '*.map *.pdb'
-          path: 'D:\tmp\program-files.dir D:\tmp\program-files-86.dir'
-          
-      - name: Upload zip
-        continue-on-error: true
-        uses: deep-soft/upload-artifact@main
-        with:
-          name: ${{ env.TAG_NAME }}
-          path: ${{ env.ZIP_RELEASE_ARCHIVE }}
+#      - name: dir program files
+#        continue-on-error: true
+#        shell: cmd
+#        run: |
+#          dir /s "C:\Program Files\" >D:\tmp\program-files.dir
+#          dir /s "C:\Program Files (x86)\" >D:\tmp\program-files-86.dir
+#          
+#      - name: Create Zip Archive with lists
+#        continue-on-error: true
+#        uses: deep-soft/zip-release@v2
+#        env:
+#          Configuration: ${{ matrix.configuration }}
+#          Platform: ${{ matrix.platform }}
+#          Target: ${{ matrix.target }}
+#        with:
+#          type: 'zip'
+#          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}-list.zip'
+#          directory: '.'
+#          exclusions: '*.map *.pdb ./.git/* .git/*'
+#          recursive_exclusions: '*.map *.pdb'
+#          path: 'D:\tmp\program-files.dir D:\tmp\program-files-86.dir'
+#          
+#      - name: Upload zip
+#        continue-on-error: true
+#        uses: deep-soft/upload-artifact@main
+#        with:
+#          name: ${{ env.TAG_NAME }}
+#          path: ${{ env.ZIP_RELEASE_ARCHIVE }}
