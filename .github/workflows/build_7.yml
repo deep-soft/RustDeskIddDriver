@@ -133,7 +133,15 @@ jobs:
 #        with:
 #          vs-version: '[14.0]'
 
+      - name: rename kits 10
+        continue-on-error: true
+        shell: cmd
+          pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
+          rename 10 100a
+          popd
+        
       - name: Build solution
+        continue-on-error: true
         shell: cmd
         run: |
           "${{ env.MSBUILD_EXE }}" ${{ env.Solution_Path }} /property:Configuration=${{ env.Configuration }} /property:Platform=${{ env.Platform }} /property:TargetVersion=${{ env.Target }}
@@ -141,6 +149,13 @@ jobs:
           Configuration: ${{ matrix.configuration }}
           Platform: ${{ matrix.platform }}
           Target: ${{ matrix.target }}
+
+      - name: restore renamed kits 10
+        continue-on-error: true
+        shell: cmd
+          pushd "C:\Program Files (x86)\Common Files\Microsoft\ExtensionManager\Extensions\Microsoft\Windows Kits\"
+          rename 100a 10
+          popd
 
       - name: Create Zip Archive Release
         continue-on-error: true      
