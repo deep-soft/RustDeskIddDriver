@@ -12,6 +12,7 @@ env:
 jobs:
   build_Win10:
     strategy:
+      fail-fast: false
       matrix:
         configuration: [Release]
         platform: [x64]
