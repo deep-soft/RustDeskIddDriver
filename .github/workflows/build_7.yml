@@ -56,7 +56,7 @@ jobs:
           popd
           echo D:\tmp\msbuild.txt
           type D:\tmp\msbuild.txt
-          set /p msbuild<D:\tmp\msbuild.txt
+          set /p msbuild=<D:\tmp\msbuild.txt
           echo "msbuild=" %msbuild%
           echo MSBUILD_EXE=%msbuild% >> $GITHUB_ENV
           :: extract msbuild path not working
@@ -143,6 +143,7 @@ jobs:
           Target: ${{ matrix.target }}
 
       - name: Create Zip Archive Release
+        continue-on-error: true      
         uses: deep-soft/zip-release@v2
         env:
           Configuration: ${{ matrix.configuration }}
