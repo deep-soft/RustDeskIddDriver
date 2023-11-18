@@ -55,6 +55,16 @@ jobs:
           recursive_exclusions: '*.map *.pdb'
           path: '${{ env.TAG_NAME }}.cer ${{ env.TAG_NAME }}.inf ${{ env.TAG_NAME }}.dll'
 
+      - name: MD5 for Zip Archive
+        uses: deep-soft/sha-checksums@v1
+        with:
+          type: 'MD5'
+          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip.md5'
+          directory: 'x64/Release'
+          path: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
+          ignore_git: true
+          # output env.SHA_SUMS
+
       - name: Upload zip
         continue-on-error: true
         uses: deep-soft/upload-artifact@main
@@ -70,6 +80,7 @@ jobs:
           # tag_name: ${{ env.TAG_NAME }}-${{ env.VERSION }}
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
+            ${{ env.SHA_SUMS }}
 
       - name: Create Zip Archive Release - ALL
         continue-on-error: true
