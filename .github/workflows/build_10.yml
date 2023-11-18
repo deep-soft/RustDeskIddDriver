@@ -58,7 +58,7 @@ jobs:
       - name: MD5 for Zip Archive
         uses: deep-soft/sha-checksums@v1
         with:
-          type: 'MD5'
+          type: 'md5'
           filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip.md5'
           directory: 'x64/Release'
           path: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
