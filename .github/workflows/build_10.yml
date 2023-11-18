@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
    
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
@@ -72,6 +72,7 @@ jobs:
             ${{ env.ZIP_RELEASE_ARCHIVE }}
 
       - name: Create Zip Archive Release - ALL
+        continue-on-error: true
         uses: deep-soft/zip-release@v2
         env:
           Configuration: ${{ matrix.configuration }}
