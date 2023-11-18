@@ -1,4 +1,5 @@
 #include "./IddController.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <newdev.h>
@@ -9,6 +10,12 @@
 
 #include "../RustDeskIddDriver/Public.h"
 
+typedef struct DeviceCreateCallbackContext
+{
+    HANDLE hEvent;
+    SW_DEVICE_LIFETIME* lifetime;
+    HRESULT hrCreateResult;
+} DeviceCreateCallbackContext;
 
 const GUID GUID_DEVINTERFACE_IDD_DRIVER_DEVICE = \
 { 0x781EF630, 0x72B2, 0x11d2, { 0xB8, 0x52,  0x00,  0xC0,  0x4E,  0xAF,  0x52,  0x72 } };
@@ -66,7 +73,7 @@ const char* GetLastMsg()
 
 BOOL InstallUpdate(LPCTSTR fullInfPath, PBOOL rebootRequired)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     // UpdateDriverForPlugAndPlayDevices may return FALSE while driver was successfully installed...
     if (FALSE == UpdateDriverForPlugAndPlayDevices(
@@ -96,7 +103,7 @@ BOOL InstallUpdate(LPCTSTR fullInfPath, PBOOL rebootRequired)
 
 BOOL Uninstall(LPCTSTR fullInfPath, PBOOL rebootRequired)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     if (FALSE == DiUninstallDriver(
         NULL,
@@ -122,7 +129,7 @@ BOOL Uninstall(LPCTSTR fullInfPath, PBOOL rebootRequired)
 
 BOOL IsDeviceCreated(PBOOL created)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     HDEVINFO hardwareDeviceInfo = SetupDiGetClassDevs(
         &GUID_DEVINTERFACE_IDD_DRIVER_DEVICE,
@@ -181,7 +188,12 @@ BOOL IsDeviceCreated(PBOOL created)
 
 BOOL DeviceCreate(PHSWDEVICE hSwDevice)
 {
-    SetLastMsg("Sucess");
+    return DeviceCreateWithLifetime(SWDeviceLifetimeHandle, NULL);
+}
+
+BOOL DeviceCreateWithLifetime(SW_DEVICE_LIFETIME *lifetime, PHSWDEVICE hSwDevice)
+{
+    SetLastMsg("Success");
 
     if (*hSwDevice != NULL)
     {
@@ -189,20 +201,13 @@ BOOL DeviceCreate(PHSWDEVICE hSwDevice)
         return FALSE;
     }
 
-    BOOL created = TRUE;
-    if (FALSE == IsDeviceCreated(&created))
-    {
-        return FALSE;
-    }
-    if (created == TRUE)
-    {
-        SetLastMsg("Device is already created, please destroy it first\n");
-        if (g_printMsg)
-        {
-            printf(g_lastMsg);
-        }
-        return FALSE;
-    }
+    // No need to check if the device is previous created.
+    // https://learn.microsoft.com/en-us/windows/win32/api/swdevice/nf-swdevice-swdevicesetlifetime
+    // When a client app calls SwDeviceCreate for a software device that was previously marked for 
+    // SwDeviceLifetimeParentPresent, SwDeviceCreate succeeds if there are no open software device handles for the device 
+    // (only one handle can be open for a device). A client app can then regain control over a persistent software device 
+    // for the purposes of updating properties and interfaces or changing the lifetime.
+    //
 
     // create device
     HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -217,6 +222,8 @@ BOOL DeviceCreate(PHSWDEVICE hSwDevice)
 
         return FALSE;
     }
+
+    DeviceCreateCallbackContext callbackContext = { hEvent, lifetime, E_FAIL, };
 
     SW_DEVICE_CREATE_INFO createInfo = { 0 };
     PCWSTR description = L"RustDesk Idd Driver";
@@ -243,7 +250,7 @@ BOOL DeviceCreate(PHSWDEVICE hSwDevice)
         0,
         NULL,
         CreationCallback,
-        &hEvent,
+        &callbackContext,
         hSwDevice);
     if (FAILED(hr))
     {
@@ -259,6 +266,7 @@ BOOL DeviceCreate(PHSWDEVICE hSwDevice)
     // Wait for callback to signal that the device has been created
     printf("Waiting for device to be created....\n");
     DWORD waitResult = WaitForSingleObject(hEvent, 10 * 1000);
+    CloseHandle(hEvent);
     if (waitResult != WAIT_OBJECT_0)
     {
         SetLastMsg("Wait for device creation failed 0x%d\n", waitResult);
@@ -268,23 +276,62 @@ BOOL DeviceCreate(PHSWDEVICE hSwDevice)
         }
         return FALSE;
     }
-    // printf("Device created\n\n");
-    return TRUE;
+
+    if (SUCCEEDED(callbackContext.hrCreateResult))
+    {
+        // printf("Device created\n\n");
+        return TRUE;
+    }
+    else
+    {
+        SetLastMsg("SwDeviceCreate failed, hrCreateResult 0x%lx\n", callbackContext.hrCreateResult);
+        return FALSE;
+    }
 }
 
 VOID DeviceClose(HSWDEVICE hSwDevice)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     if (hSwDevice != INVALID_HANDLE_VALUE && hSwDevice != NULL)
     {
+        HRESULT result = SwDeviceSetLifetime(hSwDevice, SWDeviceLifetimeHandle);
         SwDeviceClose(hSwDevice);
+    }
+    else
+    {
+        BOOL created = TRUE;
+        if (TRUE == IsDeviceCreated(&created))
+        {
+            if (created == FALSE)
+            {
+                return;
+            }
+        }
+        else
+        {
+            // Try crete sw device, and close
+        }
+
+        HSWDEVICE hSwDevice2 = NULL;
+        if (DeviceCreateWithLifetime(NULL, &hSwDevice2))
+        {
+            if (hSwDevice2 != NULL)
+            {
+                HRESULT result = SwDeviceSetLifetime(hSwDevice2, SWDeviceLifetimeHandle);
+                SwDeviceClose(hSwDevice2);
+            }
+        }
+        else
+        {
+            //
+        }
     }
 }
 
 BOOL MonitorPlugIn(UINT index, UINT edid, INT retries)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     if (retries < 0)
     {
@@ -359,7 +406,7 @@ BOOL MonitorPlugIn(UINT index, UINT edid, INT retries)
 
 BOOL MonitorPlugOut(UINT index)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     HANDLE hDevice = DeviceOpenHandle();
     if (hDevice == INVALID_HANDLE_VALUE || hDevice == NULL)
@@ -400,7 +447,7 @@ BOOL MonitorPlugOut(UINT index)
 
 BOOL MonitorModesUpdate(UINT index, UINT modeCount, PMonitorMode modes)
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     HANDLE hDevice = DeviceOpenHandle();
     if (hDevice == INVALID_HANDLE_VALUE || hDevice == NULL)
@@ -466,11 +513,32 @@ CreationCallback(
     _In_opt_ PCWSTR pszDeviceInstanceId
 )
 {
-    HANDLE hEvent = *(HANDLE*)pContext;
+    DeviceCreateCallbackContext* callbackContext = NULL;
 
-    SetEvent(hEvent);
-    UNREFERENCED_PARAMETER(hSwDevice);
-    UNREFERENCED_PARAMETER(hrCreateResult);
+    assert(pContext != NULL);
+    if (pContext != NULL)
+    {
+        callbackContext = (DeviceCreateCallbackContext*)pContext;
+        callbackContext->hrCreateResult = hrCreateResult;
+        if (SUCCEEDED(hrCreateResult))
+        {
+            if (callbackContext->lifetime)
+            {
+                HRESULT result = SwDeviceSetLifetime(hSwDevice, *callbackContext->lifetime);
+                if (FAILED(result))
+                {
+                    // TODO: debug log error here
+                }
+            }
+        }
+
+        assert(callbackContext->hEvent != NULL);
+        if (callbackContext->hEvent != NULL)
+        {
+            SetEvent(callbackContext->hEvent);
+        }
+    }
+
     // printf("Idd device %ls created\n", pszDeviceInstanceId);
 }
 
@@ -721,7 +789,7 @@ Clean0:
 // https://stackoverflow.com/questions/67164846/createfile-fails-unless-i-disable-enable-my-device
 HANDLE DeviceOpenHandle()
 {
-    SetLastMsg("Sucess");
+    SetLastMsg("Success");
 
     // const int maxDevPathLen = 256;
     TCHAR devicePath[256] = { 0 };
