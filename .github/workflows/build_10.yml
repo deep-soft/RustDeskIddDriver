@@ -61,7 +61,7 @@ jobs:
           type: 'md5'
           filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip.md5'
           directory: 'x64/Release'
-          path: "${{ env.ZIP_RELEASE_ARCHIVE }}"
+          path: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
           ignore_git: true
           # output env.SHA_SUMS
 
