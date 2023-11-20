@@ -48,7 +48,7 @@ jobs:
           Target: ${{ matrix.target }}
         with:
           type: 'zip'
-          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}.zip'
+          filename: '${{ env.TAG_NAME }}-${{ env.Configuration }}-${{ env.Platform }}-${{ env.Target }}'
           directory: 'x64/Release'
           inclusions: '*.cat *.cer *.inf *.dll *.exe *.bat'
           exclusions: '*.map *.pdb ./.git/* .git/*'
